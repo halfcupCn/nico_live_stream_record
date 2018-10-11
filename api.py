@@ -1,13 +1,15 @@
 import requests
 from bs4 import BeautifulSoup
 import json
-
+import re
 
 import websocket
 try:
     import thread
 except ImportError:
     import _thread as thread
+
+import m3u8
 
 # local proxy
 proxy = {
@@ -16,7 +18,7 @@ proxy = {
 }
 
 # url to get cookie
-cookieUrl = 'http://live2.nicovideo.jp/watch/lv315240601'
+cookieUrl = 'http://live2.nicovideo.jp/watch/lv315791128'
 
 # new session
 session = requests.Session()
@@ -40,10 +42,27 @@ getpermit = {"type": "watch", "body": {"command": "getpermit", "requirement": {"
     "protocol": "hls", "requireNewStream": True, "priorStreamQuality": "abr", "isLowLatency": True}, "room": {"isCommentable": True, "protocol": "webSocket"}}}}
 getpermit['body']['requirement']['broadcastId'] = broadcastId
 
+permit = ''
+hls_url = ''
+base_url = ''
 
 def pong(ws):
     ws.send(json.dumps({"type":"pong","body":{}})) 
 
+def watching(ws):
+    ws.send(json.dumps({"type":"watch","body":{"command":"watching","params":[permit,"-1","0"]}}))
+
+# download m3u8 file
+def download_m3u8(url):
+    m3u8 = session.get(base_url+url, proxies=proxy).text
+    # parse and download ts and then download another m3u8
+
+def download_m3u8_master(url):
+    m3u8_master = session.get(base_url+url,proxies=proxy).text
+    # parse main playlist and choose last(also the best) quality
+    master_obj = m3u8.loads(m3u8_master)
+    url = master_obj.segments.uri[-1]
+    download_m3u8(url)
 
 def on_message(ws, message):
     rep = json.loads(message)
@@ -54,6 +73,16 @@ def on_message(ws, message):
 
     if type_method == 'ping':
         pong(ws)
+        watching(ws)
+    elif type_method == 'watch':
+        # watch -> get command
+        command = body['command']
+        if command == 'permit':
+            permit = body['params'][0]
+        elif command == 'currentStream':
+            hls_url = body['uri']
+            base_url = re.split('master.m3u8',hls_url)[0]
+            download_m3u8_master(hls_url)
 
 #    type_switch[type_method]
 

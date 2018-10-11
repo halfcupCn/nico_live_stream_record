@@ -1,0 +1,36 @@
+{"type":"watch","body":{"command":"servertime","params":["1539221532661"]}}
+
+{"type":"watch","body":{"command":"permit","params":["3820220319551"]}}
+
+{"type":"watch","body":{"currentStream":{"uri":"https://pa037292458.dmc.nico/hlslive/ht2_nicolive/nicolive-hamster-lv316070046_main_9e0c4fcb092e18f19a0e3aa70ce91beee8e8ad5dd89389df6a9aeac89af92199/master.m3u8?ht2_nicolive=anonymous_user_14478334955790.omhryb_pgeuxo_3hix35kda50hr","name":null,"quality":"abr","qualityTypes":["abr","high","normal","low","super_low"],"mediaServerType":"dmc","mediaServerAuth":{"name":"ht2_nicolive","value":"anonymous_user_14478334955790.omhryb_pgeuxo_3hix35kda50hr","authType":"ht2"},"streamingProtocol":"hls"},"command":"currentstream"}}
+
+{"type":"watch","body":{"command":"statistics","params":["5175","414","261","10"]}}
+
+
+
+{"type":"watch","body":{"command":"watching","params":["3820220319551","-1","0"]}}
+
+
+https://pa037292458.dmc.nico/hlslive/ht2_nicolive/nicolive-hamster-lv316070046_main_9e0c4fcb092e18f19a0e3aa70ce91beee8e8ad5dd89389df6a9aeac89af92199/2/ts/playlist.m3u8?ht2_nicolive=anonymous_user_14478334955790.omhryb_pgeuxo_3hix35kda50hr
+Origin: http://live2.nicovideo.jp
+Referer: http://live2.nicovideo.jp/watch/lv316070046
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36
+
+ht2_nicolive: anonymous_user_14478334955790.omhryb_pgeuxo_3hix35kda50hr
+
+
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:1
+#EXT-X-MEDIA-SEQUENCE:19937
+
+#EXTINF:0.500,
+19937.ts?ht2_nicolive=anonymous_user_14478334955790.omhryb_pgeuxo_3hix35kda50hr
+
+#EXTINF:0.500,
+19938.ts?ht2_nicolive=anonymous_user_14478334955790.omhryb_pgeuxo_3hix35kda50hr
+
+#EXTINF:0.500,
+19939.ts?ht2_nicolive=anonymous_user_14478334955790.omhryb_pgeuxo_3hix35kda50hr
+
+
