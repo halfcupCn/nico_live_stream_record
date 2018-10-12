@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import re
+import os
 
 import websocket
 try:
@@ -18,7 +19,7 @@ proxy = {
 }
 
 # url to get cookie
-cookieUrl = 'http://live2.nicovideo.jp/watch/lv315791128'
+cookieUrl = 'http://live2.nicovideo.jp/watch/lv314542511'
 
 # new session
 session = requests.Session()
@@ -54,11 +55,17 @@ def watching(ws):
 
 # download m3u8 file
 def download_m3u8(url):
-    m3u8 = session.get(base_url+url, proxies=proxy).text
+    m3u8_content = session.get(base_url+url, proxies=proxy).content
     # parse and download ts and then download another m3u8
+    m3u8_obj = m3u8.loads(m3u8_content)
+    for split in m3u8_obj.segments.uri:
+        file_name = re.findall(r'\d+.ts',split)
+        with open('./video/'+file_name,mode='w',encoding='utf8') as f:
+            f.write(session.get(base_url+split).raw)
+    download_m3u8(m3u8_obj.segments.uri[-1])
 
 def download_m3u8_master(url):
-    m3u8_master = session.get(base_url+url,proxies=proxy).text
+    m3u8_master = session.get(base_url+url,proxies=proxy).content
     # parse main playlist and choose last(also the best) quality
     master_obj = m3u8.loads(m3u8_master)
     url = master_obj.segments.uri[-1]
@@ -105,24 +112,32 @@ def on_open(ws):
     thread.start_new_thread(run, ())
 
 
-headers = {
-    'Accept-Encoding': 'gzip, deflate, br',
-    'Accept-Language': 'zh-CN,zh;q=0.9',
-    'Cache-Control': 'no-cache',
-    'Connection': 'Upgrade',
-    'Host': 'msg.live2.nicovideo.jp',
-    'Origin': 'http://live2.nicovideo.jp',
-    'Pragma': 'no-cache',
-    'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
-    'Sec-WebSocket-Version': '13',
-    'Upgrade': 'websocket',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
-}
+def main():
 
-cookie_str = ';'.join(['%s=%s' % (name, value) for (name, value) in session.cookies.get_dict().items()])
+    headers = {
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept-Language': 'zh-CN,zh;q=0.9',
+        'Cache-Control': 'no-cache',
+        'Connection': 'Upgrade',
+        'Host': 'msg.live2.nicovideo.jp',
+        'Origin': 'http://live2.nicovideo.jp',
+        'Pragma': 'no-cache',
+        'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
+        'Sec-WebSocket-Version': '13',
+        'Upgrade': 'websocket',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+    }
 
-websocket.enableTrace(True)
-ws = websocket.WebSocketApp(webSocketUrl, on_message=on_message, on_error=on_error,
+    cookie_str = ';'.join(['%s=%s' % (name, value) for (name, value) in session.cookies.get_dict().items()])
+
+    websocket.enableTrace(True)
+    ws = websocket.WebSocketApp(webSocketUrl, on_message=on_message, on_error=on_error,
                             on_close=on_close, header=headers, cookie=cookie_str)
-ws.on_open = on_open
-ws.run_forever(http_proxy_host='127.0.0.1', http_proxy_port='1080')
+    ws.on_open = on_open
+    ws.run_forever(http_proxy_host='127.0.0.1', http_proxy_port='1080')
+
+    if not os.path.exists('./video'):
+        os.makedirs('./video')
+
+if __name__ == 'main':
+    main()
